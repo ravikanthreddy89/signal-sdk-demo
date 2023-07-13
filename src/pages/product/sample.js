@@ -1,4 +1,7 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
+import { PayPalButton } from "react-paypal-button-v2";
+import { PulseLoader } from 'react-spinners';
+import { useScript } from "@uidotdev/usehooks";
 import * as styles from './sample.module.css';
 
 import Accordion from '../../components/Accordion';
@@ -21,6 +24,7 @@ import { navigate } from 'gatsby';
 import AddItemNotificationContext from '../../context/AddItemNotificationProvider';
 
 const ProductPage = (props) => {
+  const [signalFetched, setSignalFetched]=useState(false);
   const ctxAddItemNotification = useContext(AddItemNotificationContext);
   const showNotification = ctxAddItemNotification.showNotification;
   const sampleProduct = generateMockProductData(1, 'sample')[0];
@@ -32,9 +36,31 @@ const ProductPage = (props) => {
   const [activeSize, setActiveSize] = useState(sampleProduct.sizeOptions[0]);
   const suggestions = generateMockProductData(4, 'woman');
 
+  const signlSdkStatus = useScript(
+    `https://www.paypal.com/identity/di/signal?load=sdk`,
+    {
+      removeOnUnmount: false,
+    }
+  );
+
+  useEffect(()=> {
+    if(window.paypal_signal !== undefined) {
+      const isActivUser = window.paypal_signal.isActiveUser("AafBGhBphJ66SHPtbCMTsH1q2HQC2lnf0ER0KWAVSsOqsAtVfnye5Vc8hAOC");
+      console.log(`SDK response:`);
+      console.log(isActivUser);
+      //setSignalFetched(isActivUser.activeUser);
+      setSignalFetched(true);
+    }
+  }, [signlSdkStatus])
+
+
+
   return (
     <Layout>
       <div className={styles.root}>
+        {/* <Helmet>
+          <script src="https://www.paypal.com/identity/di/signal?load=sdk" type="text/javascript" />
+        </Helmet> */}
         <Container size={'large'} spacing={'min'}>
           <Breadcrumbs
             crumbs={[
@@ -87,6 +113,7 @@ const ProductPage = (props) => {
                     Add to Bag
                   </Button>
                 </div>
+
                 <div
                   className={styles.wishlistActionContainer}
                   role={'presentation'}
@@ -101,6 +128,32 @@ const ProductPage = (props) => {
                     <Icon symbol={'heartFill'}></Icon>
                   </div>
                 </div>
+
+                <div>
+                  {signalFetched && 
+                    <PayPalButton
+                      amount="0.01"
+                      // shippingPreference="NO_SHIPPING" // default is "GET_FROM_FILE"
+                      onSuccess={(details, data) => {
+                        alert("Transaction completed by " + details.payer.name.given_name);
+
+                        // OPTIONAL: Call your server to save the transaction
+                        return fetch("/paypal-transaction-complete", {
+                          method: "post",
+                          body: JSON.stringify({
+                            orderID: data.orderID
+                          })
+                        });
+                      }}
+
+                      options={{
+                        clientId: "AR3mYkDZnP2vquHAVx1BXgw1tSv-zVTYQrwRmazeGbsaXEYJnVK9oes-dw4rDGShU07C6TuTCknhTI8G"
+                      }}
+                      />
+                  }
+                 {!signalFetched && <PulseLoader color="#36d7b7" />}
+                </div>
+
               </div>
 
               <div className={styles.description}>

@@ -10,7 +10,7 @@
   "scripts": {
     "develop": "gatsby develop",
     "start": "gatsby develop -p 5000",
-    "build": "gatsby build",
+    "build": "npm install --legacy-peer-deps && gatsby build",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "format": "prettier --write \"{gatsby-*.js,src/**/*.js}\"",
@@ -18,13 +18,15 @@
   },
   "dependencies": {
     "@netlify/plugin-gatsby": "^3.6.2",
+    "@uidotdev/usehooks": "^2.0.1",
     "cypress": "^10.0.3",
     "gatsby": "^4.5.4",
     "gatsby-plugin-manifest": "^4.14.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-helmet": "^6.1.0",
-    "react-slick": "^0.29.0"
+    "react-slick": "^0.29.0",
+    "react-spinners": "^0.13.8"
   },
   "devDependencies": {
     "gatsby-plugin-netlify": "^5.0.0",
