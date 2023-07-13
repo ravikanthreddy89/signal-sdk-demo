@@ -1,5 +1,4 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { PayPalButton } from "react-paypal-button-v2";
 import { PulseLoader } from 'react-spinners';
 import { useScript } from "@uidotdev/usehooks";
 import * as styles from './sample.module.css';
@@ -25,6 +24,7 @@ import AddItemNotificationContext from '../../context/AddItemNotificationProvide
 
 const ProductPage = (props) => {
   const [signalFetched, setSignalFetched]=useState(false);
+  const [isActivePPUser, setIsActivePPUser] = useState(false);
   const ctxAddItemNotification = useContext(AddItemNotificationContext);
   const showNotification = ctxAddItemNotification.showNotification;
   const sampleProduct = generateMockProductData(1, 'sample')[0];
@@ -36,6 +36,7 @@ const ProductPage = (props) => {
   const [activeSize, setActiveSize] = useState(sampleProduct.sizeOptions[0]);
   const suggestions = generateMockProductData(4, 'woman');
 
+  // load signal sdk
   const signlSdkStatus = useScript(
     `https://www.paypal.com/identity/di/signal?load=sdk`,
     {
@@ -45,13 +46,84 @@ const ProductPage = (props) => {
 
   useEffect(()=> {
     if(window.paypal_signal !== undefined) {
-      const isActivUser = window.paypal_signal.isActiveUser("AafBGhBphJ66SHPtbCMTsH1q2HQC2lnf0ER0KWAVSsOqsAtVfnye5Vc8hAOC");
+      const isActiveUser = window.paypal_signal.isActiveUser("AafBGhBphJ66SHPtbCMTsH1q2HQC2lnf0ER0KWAVSsOqsAtVfnye5Vc8hAOC");
       console.log(`SDK response:`);
-      console.log(isActivUser);
+      console.log(isActiveUser);
       //setSignalFetched(isActivUser.activeUser);
       setSignalFetched(true);
+      //setIsActivePPUser(isActivUser.activeUser);
+      setIsActivePPUser(true);
     }
-  }, [signlSdkStatus])
+  }, [signlSdkStatus]);
+
+
+  // load SPB script
+  const spbSdkStatus = useScript(
+    `https://www.paypal.com/sdk/js?client-id=AR3mYkDZnP2vquHAVx1BXgw1tSv-zVTYQrwRmazeGbsaXEYJnVK9oes-dw4rDGShU07C6TuTCknhTI8G&currency=USD`,
+    {
+      removeOnUnmount: false,
+    }
+  );
+
+  useEffect(()=> {
+    if(spbSdkStatus === 'ready' && isActivePPUser === true) {
+      paypal.Buttons({
+
+        // Call your server to set up the transaction
+        createOrder: function(data, actions) {
+            return fetch('/demo/checkout/api/paypal/order/create/', {
+                method: 'post'
+            }).then(function(res) {
+                return res.json();
+            }).then(function(orderData) {
+                return orderData.id;
+            });
+        },
+
+        // Call your server to finalize the transaction
+        onApprove: function(data, actions) {
+            return fetch('/demo/checkout/api/paypal/order/' + data.orderID + '/capture/', {
+                method: 'post'
+            }).then(function(res) {
+                return res.json();
+            }).then(function(orderData) {
+                // Three cases to handle:
+                //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
+                //   (2) Other non-recoverable errors -> Show a failure message
+                //   (3) Successful transaction -> Show confirmation or thank you
+
+                // This example reads a v2/checkout/orders capture response, propagated from the server
+                // You could use a different API or structure for your 'orderData'
+                var errorDetail = Array.isArray(orderData.details) && orderData.details[0];
+
+                if (errorDetail && errorDetail.issue === 'INSTRUMENT_DECLINED') {
+                    return actions.restart(); // Recoverable state, per:
+                    // https://developer.paypal.com/docs/checkout/integration-features/funding-failure/
+                }
+
+                if (errorDetail) {
+                    var msg = 'Sorry, your transaction could not be processed.';
+                    if (errorDetail.description) msg += '\n\n' + errorDetail.description;
+                    if (orderData.debug_id) msg += ' (' + orderData.debug_id + ')';
+                    return alert(msg); // Show a failure message (try to avoid alerts in production environments)
+                }
+
+                // Successful capture! For demo purposes:
+                console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                var transaction = orderData.purchase_units[0].payments.captures[0];
+                alert('Transaction '+ transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
+
+                // Replace the above to show a success message within this page, e.g.
+                // const element = document.getElementById('paypal-button-container');
+                // element.innerHTML = '';
+                // element.innerHTML = '<h3>Thank you for your payment!</h3>';
+                // Or go to another URL:  actions.redirect('thank_you.html');
+            });
+        }
+
+      }).render('#paypal-button-container');
+    }
+  }, [spbSdkStatus, isActivePPUser])
 
 
 
@@ -129,29 +201,8 @@ const ProductPage = (props) => {
                   </div>
                 </div>
 
-                <div>
-                  {signalFetched && 
-                    <PayPalButton
-                      amount="0.01"
-                      // shippingPreference="NO_SHIPPING" // default is "GET_FROM_FILE"
-                      onSuccess={(details, data) => {
-                        alert("Transaction completed by " + details.payer.name.given_name);
-
-                        // OPTIONAL: Call your server to save the transaction
-                        return fetch("/paypal-transaction-complete", {
-                          method: "post",
-                          body: JSON.stringify({
-                            orderID: data.orderID
-                          })
-                        });
-                      }}
-
-                      options={{
-                        clientId: "AR3mYkDZnP2vquHAVx1BXgw1tSv-zVTYQrwRmazeGbsaXEYJnVK9oes-dw4rDGShU07C6TuTCknhTI8G"
-                      }}
-                      />
-                  }
-                 {!signalFetched && <PulseLoader color="#36d7b7" />}
+                <div id = "paypal-button-container">
+                {!signalFetched && <PulseLoader color="#36d7b7" />}
                 </div>
 
               </div>
