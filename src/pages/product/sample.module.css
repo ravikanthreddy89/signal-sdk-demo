@@ -11,7 +11,7 @@
     margin-right: 32px;
 
     position: sticky;
-    top: 190px; 
+    top: 190px;
     align-self: start;
 }
 
@@ -64,6 +64,43 @@
     margin-top: 32px;
     display: flex;
     flex-wrap: wrap;
+}
+
+#paypal-button-container{
+    margin-top:10px;
+}
+
+@supports (-webkit-appearance: -apple-pay-button) {
+    .applePayButton {
+        display: none;
+        -webkit-appearance: -apple-pay-button;
+        -apple-pay-button-type: buy;
+        text-indent: -9999px;
+        -apple-pay-button-style: black;
+        height: 36px;
+        width:100%;
+        margin-bottom: 5px;
+    }
+}
+
+@supports not (-webkit-appearance: -apple-pay-button) {
+    .applePayButton {
+        display: inline-block;
+        background-size: 100% 60%;
+        background-repeat: no-repeat;
+        background-position: 50% 50%;
+        border-radius: 5px;
+        padding: 0px;
+        box-sizing: border-box;
+        min-width: 100%;
+        width:150px;
+        min-height: 40px;
+        max-height: 64px;
+        border: 0;
+        background-image: -webkit-named-image(apple-pay-logo-white);
+        background-color: black;
+        color: white;
+    }
 }
 
 .addToButtonContainer {
@@ -182,7 +219,7 @@
         max-width: unset;
     }
 
-    .gallery {    
+    .gallery {
         position: static;
         margin-right: 0px;
     }

@@ -30,13 +30,23 @@ const ProductPage = (props) => {
   const sampleProduct = generateMockProductData(1, 'sample')[0];
   const [qty, setQty] = useState(0);
   const [isWishlist, setIsWishlist] = useState(false);
+  const [showApplePay, setShowApplePay] = useState();
   const [activeSwatch, setActiveSwatch] = useState(
     sampleProduct.colorOptions[0]
   );
   const [activeSize, setActiveSize] = useState(sampleProduct.sizeOptions[0]);
   const suggestions = generateMockProductData(4, 'woman');
 
-  // load signal sdk
+  useEffect(() => {
+      if(!!window.ApplePaySession) {
+          setShowApplePay('inline-block');
+      } else {
+          setShowApplePay('none');
+      }
+  },[]);
+
+
+    // load signal sdk
   const signlSdkStatus = useScript(
     `https://www.paypal.com/identity/di/signal?load=sdk`,
     {
@@ -66,7 +76,7 @@ const ProductPage = (props) => {
   );
 
   useEffect(()=> {
-    if(spbSdkStatus === 'ready' && isActivePPUser === true) {
+    if(spbSdkStatus === 'ready' && isActivePPUser === true && !window.ApplePaySession) {
       window.paypal.Buttons({
 
         // Call your server to set up the transaction
@@ -124,8 +134,6 @@ const ProductPage = (props) => {
       }).render('#paypal-button-container');
     }
   }, [spbSdkStatus, isActivePPUser])
-
-
 
   return (
     <Layout>
@@ -200,12 +208,12 @@ const ProductPage = (props) => {
                     <Icon symbol={'heartFill'}></Icon>
                   </div>
                 </div>
-
-                <div id = "paypal-button-container">
-                {!signalFetched && <PulseLoader color="#36d7b7" />}
-                </div>
-
               </div>
+            <br/>
+            <button className={styles.applePayButton} style={{display: showApplePay}}></button>
+            <div id = "paypal-button-container">
+                {!signalFetched && <PulseLoader color="#36d7b7" />}
+            </div>
 
               <div className={styles.description}>
                 <p>{sampleProduct.description}</p>
