@@ -67,7 +67,7 @@ const ProductPage = (props) => {
 
   useEffect(()=> {
     if(spbSdkStatus === 'ready' && isActivePPUser === true) {
-      paypal.Buttons({
+      window.paypal.Buttons({
 
         // Call your server to set up the transaction
         createOrder: function(data, actions) {
