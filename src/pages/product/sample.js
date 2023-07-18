@@ -14,6 +14,7 @@ import SizeList from '../../components/SizeList';
 import Split from '../../components/Split';
 import SwatchList from '../../components/SwatchList';
 import Layout from '../../components/Layout/Layout';
+import GooglePayButton from "@google-pay/button-react";
 
 import { generateMockProductData } from '../../helpers/mock';
 import Icon from '../../components/Icons/Icon';
@@ -59,7 +60,6 @@ const ProductPage = (props) => {
       const isActiveUser = window.paypal_signal.isActiveUser("AafBGhBphJ66SHPtbCMTsH1q2HQC2lnf0ER0KWAVSsOqsAtVfnye5Vc8hAOC");
       console.log(`SDK response:`);
       console.log(isActiveUser);
-      //setSignalFetched(isActivUser.activeUser);
       setSignalFetched(true);
       //setIsActivePPUser(isActivUser.activeUser);
       setIsActivePPUser(true);
@@ -76,7 +76,7 @@ const ProductPage = (props) => {
   );
 
   useEffect(()=> {
-    if(spbSdkStatus === 'ready' && isActivePPUser === true && !window.ApplePaySession) {
+    if(spbSdkStatus === 'ready' && isActivePPUser === true) {
       window.paypal.Buttons({
 
         // Call your server to set up the transaction
@@ -211,6 +211,48 @@ const ProductPage = (props) => {
               </div>
             <br/>
             <button className={styles.applePayButton} style={{display: showApplePay}}></button>
+
+            <GooglePayButton
+                environment="TEST"
+                paymentRequest={{
+                    apiVersion: 2,
+                    apiVersionMinor: 0,
+                    allowedPaymentMethods: [
+                        {
+                            type: 'CARD',
+                            parameters: {
+                                allowedAuthMethods: ['PAN_ONLY', 'CRYPTOGRAM_3DS'],
+                                allowedCardNetworks: ['MASTERCARD', 'VISA'],
+                            },
+                            tokenizationSpecification: {
+                                type: 'PAYMENT_GATEWAY',
+                                parameters: {
+                                    gateway: 'example',
+                                    gatewayMerchantId: 'exampleGatewayMerchantId',
+                                },
+                            },
+                        },
+                    ],
+                    merchantInfo: {
+                        merchantId: '12345678901234567890',
+                        merchantName: 'Demo Merchant',
+                    },
+                    transactionInfo: {
+                        totalPriceStatus: 'FINAL',
+                        totalPriceLabel: 'Total',
+                        totalPrice: '100.00',
+                        currencyCode: 'USD',
+                        countryCode: 'US',
+                    },
+                }}
+                onLoadPaymentData={paymentRequest => {
+                    console.log('load payment data', paymentRequest);
+                }}
+                buttonSizeMode={'fill'}
+                buttonType={'buy'}
+                style={{width: '100%', marginBottom: '10px', display: showApplePay==='inline-block'?'none':'inline-block'}}
+            />
+
             <div id = "paypal-button-container">
                 {!signalFetched && <PulseLoader color="#36d7b7" />}
             </div>

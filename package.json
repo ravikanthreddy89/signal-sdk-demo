@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "develop": "gatsby develop",
-    "start": "gatsby develop -p 5000",
+    "start": "gatsby develop -p 8000",
     "build": "npm install --legacy-peer-deps && gatsby build",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
@@ -17,6 +17,7 @@
     "plop": "plop"
   },
   "dependencies": {
+    "@google-pay/button-react": "^3.0.9",
     "@netlify/plugin-gatsby": "^3.6.2",
     "@uidotdev/usehooks": "^2.0.1",
     "cypress": "^10.0.3",
