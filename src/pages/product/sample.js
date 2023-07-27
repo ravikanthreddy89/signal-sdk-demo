@@ -210,6 +210,10 @@ const ProductPage = (props) => {
                 </div>
               </div>
             <br/>
+            <div id = "paypal-button-container">
+                {!signalFetched && <PulseLoader color="#36d7b7" />}
+            </div>
+
             <button className={styles.applePayButton} style={{display: showApplePay}}></button>
 
             <GooglePayButton
@@ -252,10 +256,6 @@ const ProductPage = (props) => {
                 buttonType={'buy'}
                 style={{width: '100%', marginBottom: '10px', display: showApplePay==='inline-block'?'none':'inline-block'}}
             />
-
-            <div id = "paypal-button-container">
-                {!signalFetched && <PulseLoader color="#36d7b7" />}
-            </div>
 
               <div className={styles.description}>
                 <p>{sampleProduct.description}</p>
