@@ -23,6 +23,8 @@ import { navigate } from 'gatsby';
 
 import AddItemNotificationContext from '../../context/AddItemNotificationProvider';
 
+import SigmaDeviceManager from '@socure-inc/device-risk-sdk';
+
 const ProductPage = (props) => {
   const [signalFetched, setSignalFetched]=useState(false);
   const [isActivePPUser, setIsActivePPUser] = useState(false);
@@ -46,6 +48,11 @@ const ProductPage = (props) => {
       }
   },[]);
 
+  useEffect(() => {
+    SigmaDeviceManager.initialize({
+      sdkKey: 'ed2bee87-1088-44bc-ac17-a7b5a192f8cd'
+    });
+  }, [])
 
     // load signal sdk
   const signlSdkStatus = useScript(
@@ -66,6 +73,12 @@ const ProductPage = (props) => {
     }
   }, [signlSdkStatus]);
 
+  useEffect(() => {
+    SigmaDeviceManager.getSessionToken().then((sessionToken) => {
+      console.log("sessionToken", sessionToken);
+      // Logic to store this sessionToken
+    })
+  }, [signlSdkStatus]);
 
   // load SPB script
   const spbSdkStatus = useScript(

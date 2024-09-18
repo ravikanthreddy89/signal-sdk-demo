@@ -19,6 +19,7 @@
   "dependencies": {
     "@google-pay/button-react": "^3.0.9",
     "@netlify/plugin-gatsby": "^3.6.2",
+    "@socure-inc/device-risk-sdk": "^2.3.1",
     "@uidotdev/usehooks": "^2.0.1",
     "cypress": "^10.0.3",
     "gatsby": "^4.5.4",
