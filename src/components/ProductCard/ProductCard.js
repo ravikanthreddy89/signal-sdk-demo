@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { navigate } from 'gatsby';
 import * as styles from './ProductCard.module.css';
 
+import { Helmet } from 'react-helmet';
 import Icon from '../Icons/Icon';
 import CurrencyFormatter from '../CurrencyFormatter';
 
@@ -34,6 +35,12 @@ const ProductCard = (props) => {
 
   return (
     <div className={styles.root}>
+      <Helmet>
+        <script
+          src="https://floating-widget-two.vercel.app/floating-widget.js"
+          type="text/javascript"
+        />
+      </Helmet>
       <div
         className={styles.imageContainer}
         onClick={() => handleRouteToProduct()}

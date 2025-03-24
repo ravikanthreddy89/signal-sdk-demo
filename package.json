@@ -26,7 +26,6 @@
     "gatsby-plugin-manifest": "^4.14.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "react-helmet": "^6.1.0",
     "react-slick": "^0.29.0",
     "react-spinners": "^0.13.8"
   },
@@ -34,6 +33,7 @@
     "gatsby-plugin-netlify": "^5.0.0",
     "netlify-plugin-cypress": "~2.2.0",
     "plop": "^3.0.5",
-    "prettier": "^2.6.2"
+    "prettier": "^2.6.2",
+    "react-helmet": "^6.1.0"
   }
 }
