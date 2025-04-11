@@ -21,6 +21,7 @@
     "@netlify/plugin-gatsby": "^3.6.2",
     "@socure-inc/device-risk-sdk": "^2.3.1",
     "@uidotdev/usehooks": "^2.0.1",
+    "chalk": "^5.4.1",
     "cypress": "^10.0.3",
     "gatsby": "^4.5.4",
     "gatsby-plugin-manifest": "^4.14.0",
